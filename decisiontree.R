@@ -1,5 +1,8 @@
+# Decision Tree with R | Complete Example
+# https://www.youtube.com/watch?v=tU3Adlru1Ng
 #Read data file
-mydata <- read.csv("~/Dropbox/Public/Cardiotocographic.csv")
+mydata <- read.csv("../DataScience/Cardiotocographic.csv")
+str(mydata)
 mydata$NSPF <- as.factor(mydata$NSP)
 
 #Decision tree with party
