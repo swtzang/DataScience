@@ -95,6 +95,8 @@ model_coef_nested <- gap_models %>%
 model_coef <- model_coef_nested %>%
   unnest(coef)
 
+model_coef
+
 # Plot a histogram of the coefficient estimates for year         
 model_coef %>% 
   filter(term == "year") %>% 
