@@ -20,13 +20,14 @@ head(gap_nested)
 
 # Create the unnested dataframe called gap_unnnested
 gap_unnested <- gap_nested %>% 
-  unnest()
+                unnest()
 
 # Confirm that your data was not modified  
 identical(gapminder, gap_unnested)
 
 # Extract the data of Algeria
 algeria_df <- gap_nested$data[[1]]
+algeria_df
 
 # Calculate the minimum of the population vector
 min(algeria_df$population)
@@ -63,6 +64,12 @@ head(pop_mean)
 gap_models <- gap_nested %>%
   mutate(model = map(data, ~lm(formula = life_expectancy~year, data = .x)))
 
+gap_models_01 <- gap_nested %>% 
+       mutate(model = map(data, ~lm(formula = life_expectancy~., data = .x))) %>% 
+       mutate(out = map(model, ~ as.data.frame(t(as.matrix(coef(.))))))
+
+map_df(gap_models_01$out, rbind)       
+        
 # Extract the model for Algeria    
 algeria_model <- gap_models$model[[1]]
 
@@ -90,18 +97,18 @@ algeria_fitted %>%
 # Extract the coefficient statistics of each model into nested dataframes
 model_coef_nested <- gap_models %>% 
   mutate(coef = map(model, ~tidy(.x)))
+model_coef_nested
 
 # Simplify the coef dataframes for each model    
 model_coef <- model_coef_nested %>%
-  unnest(coef)
-
+              unnest(coef)
 model_coef
 
 # Plot a histogram of the coefficient estimates for year         
 model_coef %>% 
-  filter(term == "year") %>% 
-  ggplot(aes(x = estimate)) +
-  geom_histogram()
+           filter(term == "year") %>% 
+           ggplot(aes(x = estimate)) +
+           geom_histogram()
 
 # Question: 
 # What can we learn about these 77 countries?
@@ -119,11 +126,11 @@ model_coef %>%
 
 # Extract the fit statistics of each model into dataframes
 model_perf_nested <- gap_models %>% 
-  mutate(fit = map(model, ~glance(.x)))
+                     mutate(fit = map(model, ~glance(.x)))
 
 # Simplify the fit dataframes for each model    
 model_perf <- model_perf_nested %>% 
-  unnest(fit)
+              unnest(fit)
 
 # Look at the first six rows of model_perf
 head(model_perf)
@@ -136,16 +143,20 @@ model_perf %>%
 # Extract the 4 best fitting models
 best_fit <- model_perf %>% 
   top_n(n = 4, wt = r.squared)
-
+best_fit
 # Extract the 4 models with the worst fit
 worst_fit <- model_perf %>% 
   top_n(n = 4, wt = -r.squared)
+worst_fit
 
+#
 best_augmented <- best_fit %>% 
   # Build the augmented dataframe for each country model
   mutate(augmented = map(model, ~augment(.x))) %>% 
   # Expand the augmented dataframes
   unnest(augmented)
+best_augmented
+
 #
 worst_augmented <- worst_fit %>% 
   # Build the augmented dataframe for each country model
@@ -179,11 +190,14 @@ fullmodel_perf <- gap_fullmodel %>%
   # Simplify the fit dataframes for each model
   unnest(fit)
 
+fullmodel_perf
+
 # View the performance for the four countries with the worst fitting 
 # four simple models you looked at before
 fullmodel_perf %>% 
   filter(country %in% worst_fit$country) %>% 
   select(country, adj.r.squared)
+
 # Which of these four models do you expect to perform the best for future years?
 fullmodel_perf %>% 
   filter(country %in% best_fit$country) %>% 
@@ -192,15 +206,15 @@ fullmodel_perf %>%
 set.seed(42)
 
 # Prepare the initial split object
-
 gap_split <- initial_split(gapminder, prop = 0.75)
 
+gap_split
 # Extract the training dataframe
 training_data <- training(gap_split)
 
 # Extract the testing dataframe
 testing_data <- testing(gap_split)
-
+testing_data
 # Calculate teh dimensions of both training_data and testing_data
 dim(training_data)
 dim(testing_data)
@@ -211,9 +225,11 @@ set.seed(42)
 # you will split the training data into a series of 5 train-validate sets using the vfold_cv() function 
 # from the rsample package.
 cv_split <- vfold_cv(training_data, v = 5)
+cv_split$splits[[1]]
 
+#
 cv_data <- cv_split %>% 
-  mutate(
+    mutate(
     # Extract the train dataframe for each split
     train = map(splits, ~training(.x)), 
     # Extract the validate dataframe for each split
@@ -222,10 +238,21 @@ cv_data <- cv_split %>%
 
 # Use head() to preview cv_data
 head(cv_data)
+cv_data$train[[1]]
 
 # Build a model using the train data for each fold of the cross validation
 cv_models_lm <- cv_data %>% 
   mutate(model = map(train, ~lm(formula = life_expectancy~., data = .x)))
+#
+tt <- cv_data %>% 
+  mutate(model  = map(train, ~lm(formula = life_expectancy~., data = .x))) %>% 
+  mutate(reg = map(model, ~ as.data.frame(t(as.matrix(coef(.))))))
+
+tt$reg[[1]]
+tt <- coefficients(cv_models_lm$model[[1]])
+
+
+
 #
 cv_prep_lm <- cv_models_lm %>% 
   mutate(
@@ -308,7 +335,12 @@ test_predicted <- predict(best_model, testing_data)$predictions
 # Calculate the test MAE
 mae(test_actual, test_predicted)
 
+# Example of map function ----
+tt <- mtcars %>%
+  split(.$cyl) %>%
+  map(~ lm(mpg ~ wt, data = .x)) %>%
+  map_df(~ as.data.frame(t(as.matrix(coef(.)))))
 
-
-
-
+iris
+a.lm <- lm(Petal.Width~Species, data=iris)
+anova(a.lm)
