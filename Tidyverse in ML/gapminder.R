@@ -63,7 +63,7 @@ head(pop_mean)
 # Build a linear model for each country
 gap_models <- gap_nested %>%
   mutate(model = map(data, ~lm(formula = life_expectancy~year, data = .x)))
-
+#
 gap_models_01 <- gap_nested %>% 
        mutate(model = map(data, ~lm(formula = life_expectancy~., data = .x))) %>% 
        mutate(out = map(model, ~ as.data.frame(t(as.matrix(coef(.))))))
@@ -191,6 +191,7 @@ fullmodel_perf <- gap_fullmodel %>%
   unnest(fit)
 
 fullmodel_perf
+fullmodel_perf$data
 
 # View the performance for the four countries with the worst fitting 
 # four simple models you looked at before
@@ -243,17 +244,16 @@ cv_data$train[[1]]
 # Build a model using the train data for each fold of the cross validation
 cv_models_lm <- cv_data %>% 
   mutate(model = map(train, ~lm(formula = life_expectancy~., data = .x)))
+
+#lm(formula  = life_expectancy~., data = cv_data$train[[1]])
 #
-tt <- cv_data %>% 
-  mutate(model  = map(train, ~lm(formula = life_expectancy~., data = .x))) %>% 
-  mutate(reg = map(model, ~ as.data.frame(t(as.matrix(coef(.))))))
+#tt <- cv_data %>% 
+#  mutate(model  = map(train, ~lm(formula = life_expectancy~., data = .x))) %>% 
+#  mutate(reg = map(model, ~ as.data.frame(t(as.matrix(coef(.))))))
 
-tt$reg[[1]]
-tt <- coefficients(cv_models_lm$model[[1]])
+#tt$reg[[1]]
+#tt <- coefficients(cv_models_lm$model[[1]])
 
-
-
-#
 cv_prep_lm <- cv_models_lm %>% 
   mutate(
     # Extract the recorded life expectancy for the records in the validate dataframes
@@ -261,6 +261,8 @@ cv_prep_lm <- cv_models_lm %>%
     # Predict life expectancy for each validate set using its corresponding model
     validate_predicted = map2(.x = model, .y = validate, ~predict(.x, .y))
   )
+
+cv_eval_lm
 
 #
 library(Metrics)
