@@ -1,27 +1,40 @@
+rm(list=ls())
+
 library(tidyverse)
 library(readr)
+library(dplyr)
+
+# https://github.com/fivethirtyeight/data/tree/master/comic-characters
+
 # Print the first rows of the data
+#comics <- read_csv('../DataScience/Exploratory data analysis/comics.csv')
 comics <- read_csv('../DataScience/Exploratory data analysis/comics.csv', col_types = cols(
                    id    = col_factor(),
                    align = col_factor(),
                    hair  = col_factor(),
                    gender= col_factor(),
-                   alive = col_factor() 
+                   alive = col_factor(), 
+                   gsm   = col_factor()
                    ))
+str(comics)
+
+# Examine NAs for column gender 
+comics %>% summarise(number_nas = sum(is.na(gender)))
+ 
+# Examine NAs for all columns
+# purrr::map_df() to “map” function over each column
+comics %>% 
+       purrr::map_df(~sum(is.na(.)))
 
 # Check levels of align
 levels(comics$align)
 
 # Check the levels of gender
 levels(comics$gender)
+levels(comics$gsm)
 
 # Create a 2-way contingency table
 tab <- table(comics$align, comics$gender)
-
-# Load dplyr
-library(dplyr)
-
-# Print tab
 tab
 
 # Remove align level
@@ -89,7 +102,10 @@ ggplot(pies, aes(x = flavor)) +
 
 
 
-
+ggplot(comics, aes(x = id, fill = align)) +
+  #geom_bar()
+  geom_bar(position = "fill") +
+  ylab("proportion")
 
 
 
