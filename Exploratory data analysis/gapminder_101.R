@@ -8,7 +8,7 @@ library(rsample)
 # import data gapminder
 gapminder <- read_rds('../DataScience/Tidyverse in ML/gapminder.rds')
 # write_csv(gapminder, '../DataScience/Exploratory data analysis/gapminder.csv')
-data(gapminder)
+#data(gapminder)
 head(gapminder)
 str(gapminder)
 
@@ -59,24 +59,22 @@ gdp_byyear <- gapminder %>%
 # Q4: Calculate the minimum, maximum, mean and se of each country life-expectancy.----
 gapminder %>% group_by(country) %>% 
               summarize(
-              mean_le = mean(lifeExp),
-              min_le = min(lifeExp),
-              max_le = max(lifeExp),
-              se_le = sd(lifeExp)/sqrt(n()))
-# Q5: Calculate GDP only for people with a life expectation above 25
+              mean_le = mean(life_expectancy),
+              min_le = min(life_expectancy),
+              max_le = max(life_expectancy),
+              se_le = sd(life_expectancy)/sqrt(n()))
+# Q5: Calculate mean and std for gdpPercap and population respectively only for people with a life expectation above 25.
 
 gdp_pop_bycountry_above25 <- gapminder %>%
-  mutate(gdpPercap_25 = ifelse(lifeExp > 25, gdpPercap, NA)) %>%
+  mutate(gdpPercap_25 = ifelse(life_expectancy > 25, gdpPercap, NA)) %>%
   group_by(country) %>%
   summarize(mean_gdpPercap = mean(gdpPercap_25),
             sd_gdpPercap = sd(gdpPercap_25),
-            mean_pop = mean(pop),
-            sd_pop = sd(pop)
+            mean_pop = mean(population),
+            sd_pop = sd(population)
             )
 
-gdp_pop_bycountry_above25 %>% group_by(country)
-
-
+gdp_pop_bycountry_above25
 
 
 
