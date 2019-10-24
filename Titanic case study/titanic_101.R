@@ -118,6 +118,9 @@ train2 <- full[1:891,]
 test2 <- full[892:1309,]
 train2$Survived <- as.factor(train2$Survived)
 
+test2$Survived
+test2$Survived[is.na(test2$Survived)] <- 0
+
 # randomForest
 library(rsample)      # data splitting 
 library(randomForest) # basic implementation

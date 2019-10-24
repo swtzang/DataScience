@@ -2,12 +2,12 @@
 
 # Explore gapminder
 
-
+rm(list=ls())
 # Prepare the nested dataframe gap_nested
 library(tidyverse)
 library(rsample)
 
-gapminder <- read_rds('../DataScience/Tidyverse in ML/gapminder.rds')
+gapminder <- read_rds('../Tidyverse in ML/gapminder.rds')
 head(gapminder)
 str(gapminder)
 
