@@ -7,7 +7,9 @@
 # Part 1:
 # Data Exploration and basic Model Building
 
-setwd('../DataScience/Titanic case study/')
+rm(list=ls())
+
+#setwd('../DataScience/Titanic case study/')
 train <- read.csv("train.csv")
 test <- read.csv("test.csv")
 
@@ -29,12 +31,12 @@ prop.table(table(train$Survived))
 table(train$Sex, train$Survived)
 prop.table(table(train$Sex, train$Survived),margin = 1)
 
-train$Child <- 0
-train$Child[train$Age < 18] <- 1
+#train$Child <- 0
+#train$Child[train$Age < 18] <- 1
 
-aggregate(Survived ~ Child + Sex, data=train, FUN=sum)
-aggregate(Survived ~ Child + Sex, data=train, FUN=length)
-aggregate(Survived ~ Child + Sex, data=train, FUN=function(x) {sum(x)/length(x)})
+#aggregate(Survived ~ Child + Sex, data=train, FUN=sum)
+#aggregate(Survived ~ Child + Sex, data=train, FUN=length)
+#aggregate(Survived ~ Child + Sex, data=train, FUN=function(x) {sum(x)/length(x)})
 
 # Model Building
 # First prediction – All Female Survived
@@ -44,7 +46,7 @@ test_female$Survived[test_female$Sex == "female"] <- 1
 
 # Create a data frame with two columns: PassengerId & Survived and write the solution away to a csv file.
 my_solution <- data.frame(PassengerId = test_female$PassengerId, Survived = test_female$Survived)
-write.csv(my_solution, file =  "all_female_survive.csv", row.names = FALSE)
+# write.csv(my_solution, file =  "all_female_survive.csv", row.names = FALSE)
 
 # Clean up the dataset
 colSums(is.na(train))
@@ -102,7 +104,7 @@ fancyRpartPlot(my_dt1)
 
 Prediction <- predict(my_dt1, test, type = "class")
 submit <- data.frame(PassengerId = test$PassengerId, Survived = Prediction)
-write.csv(submit, file = "myfirstdtree.csv", row.names = FALSE)
+# write.csv(submit, file = "myfirstdtree.csv", row.names = FALSE)
 
 # Categorical casting
 str(full)
