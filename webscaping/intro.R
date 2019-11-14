@@ -11,7 +11,7 @@ library(rvest)
 library(stringr)
 library(selectr)
 
-url <- 'https://www.amazon.in/OnePlus-Mirror-Black-64GB-Memory/dp/B0756Z43QS?tag=googinhydr18418-21&tag=googinkenshoo-21&ascsubtag=aee9a916-6acd-4409-92ca-3bdbeb549f80'
+url <- 'https://www.amazon.in/dp/B07KM2PL5C/ref=dp_prsubs_1'
 
 webpage <- read_html(url)
 
@@ -22,14 +22,14 @@ head(title)
 # remove all space and new lines
 # str_replace_all(string, pattern, replacement)
 title <- str_replace_all(title, "[\r\n]" , "")
-
+title
 # scrape the price of the product
 price_html <- html_nodes(webpage, 'span#priceblock_ourprice')
 price <- html_text(price_html)
 price
 
 price <- str_replace_all(price, "[\r\n]" , "")
-
+price
 #scrape product description
 desc_html <- html_nodes(webpage, 'div#productDescription')
 desc <- html_text(desc_html)
@@ -49,6 +49,13 @@ rate <- html_text(rate_html)
 rate <- str_replace_all(rate, "[\r\n]" , "")
 rate <- str_trim(rate)
 rate
+#
+tab <- html_table(webpage, fill = TRUE)
+str(tab)
+tab[[4]]
+
+#
+ html_nodes(webpage, 'div')
 
 # Scrape size of the product
 size_html <- html_nodes(webpage, 'div#variation_size_name')
