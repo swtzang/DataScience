@@ -293,14 +293,98 @@ date <- rownames(Tdata.train[start+len.tr,])
 marketTP <- GSPC[paste(date,'/',sep='')][1:len.ts]
 ## learning the model and obtaining its signal predictions for the test period
 library(e1071)
-s <- svm(Tform, Tdata.train[tr,], cost=10,gamma=0.01)
+s <- svm(Tform, Tdata.train[tr,], cost=10, gamma=0.01)
 p <- predict(s, Tdata.train[ts,])
 sig <- trading.signals(p, 0.1, -0.1)
 ## now using the simulated trader during the testing period
+#=================================================================================
+# The following code is testing the function policy.1() 
+#=================================================================================
+
+#
+signals <- sig
+market <- marketTP
+policy.1 <- function(signals, market, opened.pos, money,
+                     bet=0.2,hold.time=10,
+                     exp.prof=0.025, max.loss= 0.05
+)
+{
+  d <- NROW(market) # this is the ID of today
+  orders <- NULL
+  nOs <- NROW(opened.pos)
+  # nothing to do!
+  if (!nOs && signals[d] == 'h') return(orders)
+  
+  # First lets check if we can open new positions
+  # i) long positions
+  if (signals[d] == 'b' && !nOs) {
+    quant <- round(bet*money/Cl(market)[d],0)
+    if (quant > 0) 
+      orders <- rbind(orders,
+                      data.frame(order=c(1,-1,-1),order.type=c(1,2,3), 
+                                 val = c(quant,
+                                         Cl(market)[d]*(1+exp.prof),
+                                         Cl(market)[d]*(1-max.loss)
+                                 ),
+                                 action = c('open','close','close'),
+                                 posID = c(NA,NA,NA)
+                      )
+      )
+    
+    # ii) short positions  
+  } else if (signals[d] == 's' && !nOs) {
+    # this is the nr of stocks we already need to buy 
+    # because of currently opened short positions
+    need2buy <- sum(opened.pos[opened.pos[,'pos.type']==-1,
+                               "N.stocks"])*Cl(market)[d]
+    quant <- round(bet*(money-need2buy)/Cl(market)[d],0)
+    if (quant > 0)
+      orders <- rbind(orders,
+                      data.frame(order=c(-1,1,1),order.type=c(1,2,3), 
+                                 val = c(quant,
+                                         Cl(market)[d]*(1-exp.prof),
+                                         Cl(market)[d]*(1+max.loss)
+                                 ),
+                                 action = c('open','close','close'),
+                                 posID = c(NA,NA,NA)
+                      )
+      )
+  }
+  
+  # Now lets check if we need to close positions
+  # because their holding time is over
+  if (nOs) 
+    for(i in 1:nOs) {
+      if (d - opened.pos[i,'Odate'] >= hold.time)
+        orders <- rbind(orders,
+                        data.frame(order=-opened.pos[i,'pos.type'],
+                                   order.type=1,
+                                   val = NA,
+                                   action = 'close',
+                                   posID = rownames(opened.pos)[i]
+                        )
+        )
+    }
+  
+  orders
+}
+
+
+
+
+
+
+
+
+
+
 t1 <- trading.simulator(marketTP, signals=sig, policy.func='policy.1',
                         policy.pars=list(exp.prof=0.05,bet=0.2,hold.time=30))
 t1
 summary(t1)
+str(t1)
+t1@trading
+t1@positions
 #
 tradingEvaluation(t1)
 
