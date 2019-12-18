@@ -48,18 +48,23 @@ scraplinks <- function(url){
 url_scraped <- url %>% scraplinks() 
 # 2 colnames by scraped url given by website: link and url 
 colnames(url_scraped)
+url_scraped$link
+# [1] "link" "url" 
 # convert factor into character
 url_scraped_1 <- as.character(url_scraped$link)
 str(url_scraped_1)
 #
 url_scraped_2 <- as.character(url_scraped$url)
 str(url_scraped_2)
-# extract url
+url_scraped_2
+# extract url for each paper
 url_paper <- url_scraped_2[grepl('/a/bla/', url_scraped_2)]
 # delete first 2 elements which are useless data
 url_paper <- url_paper[-c(1,2)]
+url_paper
 # total number of papers on this webpage
 length(url_paper)
+url_paper[1]
 #
 title_paper <- url_scraped_1[grepl('/a/bla/', url_scraped_2)]
 head(title_paper)
@@ -67,6 +72,41 @@ head(title_paper)
 title_paper <- title_paper[-c(1,2)]
 length(title_paper)
 title_paper
+#===================
+url_paper_complete <- url_paper %>% map(function(x) paste("https://ideas.repec.org", x, sep="")) %>% 
+                      unlist()
+length(url_paper_complete)
+url_paper_i <- url_paper_complete[1]
+url_paper_i
+#-------------------
+# url <- url_paper_i
 
+abstract <- function(url){
+            webpage <- xml2::read_html(url)
+            # Extract the URLs
+            abstract_i <- webpage %>%
+            rvest::html_nodes('#abstract-body') %>% 
+            html_text
+            return(abstract_i)
+}
+#abstract(url)
 
+url_i <- url_paper_complete[1:10]
+abstract_i <- url_i %>% sapply(., function(x) abstract(x))
+#abstract_i <- url %>% map(function(x) abstract(x)) %>% unlist
+length(abstract_i)
+names(abstract_i)
+glimpse(abstract_i)
+names
+#
+# url <- url_paper_i
+author <- function(url){
+          webpage <- xml2::read_html(url)
+          author_i <- webpage %>% 
+                      rvest::html_nodes(".authorname") %>% 
+                      html_text
+          return(author_i)
+}
 
+author_i <- url_i %>% sapply(., function(x) author(x))
+#
