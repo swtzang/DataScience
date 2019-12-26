@@ -22,8 +22,9 @@ library(tbl2xts)
 # GSPC <- AAPL
 
 
-# GSPC <- getSymbols("^GSPC",from="1970-01-02",to="2016-01-25",auto.assign=FALSE)
+GSPC <- getSymbols("^GSPC",from="1970-01-02",to="2016-01-25",auto.assign=FALSE)
 class(GSPC)
+dim(GSPC)
 #### sub-section:  What to Predict?
 
 ##
@@ -33,12 +34,11 @@ T.ind <- function(quotes, tgt.margin = 0.025, n.days = 10) {
   v[1] <- Cl(quotes)[1]
   
   r <- matrix(NA, ncol = n.days, nrow = NROW(quotes))
-  # x = 1
-  for (i in 1:n.days) r[, i] <- Next(Delt(v, k = i), i)
+  for (x in 1:n.days) r[, x] <- Next(Delt(v, k = x), x)
   
-  y <- apply(r, 1, function(x) sum(x[x > tgt.margin | x < -tgt.margin]))
+  x <- apply(r, 1, function(x) sum(x[x > tgt.margin | x < -tgt.margin]))
   
-  if (is.xts(quotes)) xts(y, time(quotes)) else y
+  if (is.xts(quotes)) xts(x, time(quotes)) else x
 }
 
 candleChart(last(GSPC,'3 months'),theme='white', TA=NULL)
@@ -47,7 +47,6 @@ addAvgPrice <- newTA(FUN=avgPrice,col=1,legend='AvgPrice')
 addT.ind <- newTA(FUN=T.ind,col='red', legend='tgtRet')
 addAvgPrice(on=1) 
 addT.ind()
-
 ##
 avgPrice <- function(p) apply(HLC(p), 1, mean) 
 addAvgPrice <- newTA(FUN=avgPrice, col=1, legend='AvgPrice')

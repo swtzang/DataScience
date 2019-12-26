@@ -22,7 +22,25 @@ colnames(df_stock)[5] <- "Close"
 colnames(df_index)[5] <- "Close"
 ## Compute the price change for the stock and classify as UP/DOWN
 price = df_stock$Close-df_stock$Open
+# What to predict? 
+# 1.
 class = ifelse(price > 0,"UP","DOWN")
+
+# 2.
+T.ind <- function(quotes, tgt.margin = 0.025, n.days = 10) {
+  v <- apply(HLC(quotes), 1, mean)
+  v[1] <- Cl(quotes)[1]
+  
+  r <- matrix(NA, ncol = n.days, nrow = NROW(quotes))
+  for (x in 1:n.days) r[, x] <- Next(Delt(v, k = x), x)
+  
+  x <- apply(r, 1, function(x) sum(x[x > tgt.margin | x < -tgt.margin]))
+  
+  if (is.xts(quotes)) xts(x, time(quotes)) else x
+}
+
+T.ind(df_stock)
+
 
 ## Compute the various technical indicators that will be used 
 # Force Index Indicator

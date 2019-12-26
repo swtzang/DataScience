@@ -11,6 +11,7 @@ library(xml2)
 library(rvest)
 library(stringr)
 library(selectr)
+library(xts)
 
 url <- 'https://ideas.repec.org/s/bla/jfinan.html'
 
@@ -91,13 +92,16 @@ abstract <- function(url){
 }
 #abstract(url)
 
-url_i <- url_paper_complete[1:10]
-abstract_i <- url_i %>% sapply(., function(x) abstract(x))
+#url_i <- url_paper_complete[100:150]
+abstract_all <- url_paper_complete %>% sapply(., function(x) abstract(x))
 #abstract_i <- url %>% map(function(x) abstract(x)) %>% unlist
-length(abstract_i)
-names(abstract_i)
-glimpse(abstract_i)
-names
+abstract_all.tbl <- as_tibble(abstract_all)
+abstract_all.tbl
+
+length(abstract_all)
+names(abstract_all)
+glimpse(abstract_all)
+
 #
 # url <- url_paper_i
 author <- function(url){
@@ -108,5 +112,8 @@ author <- function(url){
           return(author_i)
 }
 
-author_i <- url_i %>% sapply(., function(x) author(x))
+author_all <- url_paper_complete %>% sapply(., function(x) author(x))
+length(author_all)
+author_all %>% coredata(author_i)
 #
+
