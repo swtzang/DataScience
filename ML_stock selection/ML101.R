@@ -1,9 +1,9 @@
 # https://machinelearningmastery.com/machine-learning-in-r-step-by-step/
 # Your First Machine Learning Project in R Step-By-Step
 
-install.packages("caret")
+# install.packages("caret")
 
-install.packages("caret", dependencies=c("Depends", "Suggests"))
+# install.packages("caret", dependencies=c("Depends", "Suggests"))
 
 library(caret)
 
