@@ -1,6 +1,8 @@
 # https://www.freecodecamp.org/news/an-introduction-to-web-scraping-using-r-40284110c848/
 # https://text-mining-with-r-a-tidy-approach.netlify.com/tidytext
 # https://cran.r-project.org/web/packages/tidytext/vignettes/tidytext.html
+# https://cran.r-project.org/web/packages/tidytext/vignettes/tidytext.html
+
 rm(list=ls())
 
 # install.packages('selectr')
