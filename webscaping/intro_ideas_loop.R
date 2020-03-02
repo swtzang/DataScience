@@ -16,6 +16,7 @@ library(rvest)
 library(stringr)
 library(selectr)
 library(xts)
+library(tidytext)
 
 url <- 'https://ideas.repec.org/s/bla/jfinan.html'
 suffix <- 2:29
@@ -38,6 +39,7 @@ for (i in url_all){
 
 str(url.list)
 str(abstract.list)
+abstract.list[[1]]
 #
 scraplinks <- function(url){
   # Create an html document from the url
@@ -71,7 +73,7 @@ abstract <- function(url){
 #webpage <- xml2::read_html(url)
 library(tm)
 
-p1 <- data.frame((sapply(abstract.list[[1]],c)), stringsAsFactors = FALSE) 
+p1 <- data.frame((sapply(abstract.list[[2]],c)), stringsAsFactors = FALSE) 
 colnames(p1) <- 'abs_text'
 
 # 
